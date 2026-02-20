@@ -1,0 +1,161 @@
+/* ===== GLOBAL ===== */
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: #0f0f14;
+  color: #f5f5f5;
+}
+
+/* Instagram gradient accent */
+:root {
+  --insta-gradient: linear-gradient(
+    45deg,
+    #f09433,
+    #e6683c,
+    #dc2743,
+    #cc2366,
+    #bc1888
+  );
+}
+
+.container {
+  padding: 50px 70px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 40px;
+  font-weight: 600;
+  background: var(--insta-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== CONTROLS ===== */
+
+.controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+input, button, select {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #2a2a35;
+  background: #1a1a23;
+  color: white;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+  border-color: #cc2366;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover, select:hover {
+  transform: translateY(-2px);
+  border-color: #dc2743;
+  box-shadow: 0 8px 20px rgba(220, 39, 67, 0.25);
+}
+
+/* ===== GRID ===== */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* ===== CARD ===== */
+
+.card {
+  background: #181821;
+  padding: 22px;
+  border-radius: 18px;
+  border: 1px solid #262636;
+  transition: 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.5s forwards;
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: #cc2366;
+  box-shadow: 0 14px 28px rgba(188, 24, 136, 0.2);
+}
+
+/* subtle gradient top bar */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: var(--insta-gradient);
+}
+
+/* ===== TEXT ===== */
+
+.card p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d3d3d3;
+}
+
+.card a {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 13px;
+  text-decoration: none;
+  background: var(--insta-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 500;
+}
+
+.card a:hover {
+  opacity: 0.8;
+}
+
+/* ===== BADGE ===== */
+
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  background: var(--insta-gradient);
+  color: white;
+}
+
+/* ===== EMPTY STATE ===== */
+
+.empty {
+  text-align: center;
+  margin-top: 80px;
+  color: #888;
+  font-size: 16px;
+}
