@@ -101,7 +101,7 @@ Just paste a link to begin 🚀`
 📝 ${aiResult.summary}
 
 🔗 *View your dashboard:*
-https://social-saver-frontend-yk.onrender.com/?user=${chatId}`
+https://social-saver-yk.onrender.com/?user=${chatId}`
   }
 );
 
