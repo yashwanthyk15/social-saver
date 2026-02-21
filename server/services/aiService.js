@@ -15,17 +15,16 @@ const analyzeContent = async (text) => {
       model: "gemini-2.5-flash"
     });
 
-    const prompt = `
+   const prompt = `
 You are an advanced content intelligence engine for a personal knowledge storage system.
 
-Analyze the following content deeply.
+Analyze the following content carefully and understand its core meaning.
 
 Rules:
-1. Understand sarcasm, irony, memes, exaggeration.
-2. Detect real meaning behind humor or satire.
-3. Use global context if implied.
-4. Assign ONE accurate category.
-5. Generate ONE clear English sentence summary.
+1. Focus on the main idea or topic of the content.
+2. Identify the central theme or purpose.
+3. Assign ONE accurate category.
+4. Generate ONE clear English sentence summary.
 
 Category rules:
 • If it clearly fits one of these, use EXACTLY one:
@@ -35,6 +34,11 @@ Category rules:
   - Create a short meaningful category (max 2 words)
   - Do NOT use vague labels like Other or Misc
 
+Summary rules:
+• Must be in English.
+• Must be one concise sentence.
+• Must clearly describe the main meaning of the content.
+
 Return ONLY valid JSON.
 No markdown.
 No explanation.
@@ -43,7 +47,7 @@ No extra text.
 Format:
 {
   "category": "CategoryName",
-  "summary": "One clear sentence summarizing the real meaning."
+  "summary": "One clear sentence summarizing the content."
 }
 
 Content:
