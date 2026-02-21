@@ -6,18 +6,27 @@ const BASE_URL = "https://social-saver-backend.onrender.com";
 const ContentCard = ({ item, onDelete }) => {
   if (!item) return null;
 
+  const formattedDate = item.createdAt
+    ? new Date(item.createdAt).toLocaleDateString()
+    : null;
+
   const handleDelete = async () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this item?"
+    );
+
+    if (!confirmDelete) return;
+
     try {
-      await axios.delete(`${BASE_URL}/dashboard/delete/${item._id}`);
+      await axios.delete(
+        `${BASE_URL}/dashboard/delete/${item._id}`
+      );
+
       onDelete(item._id);
     } catch (error) {
       console.error("Delete failed:", error);
     }
   };
-
-  const formattedDate = item.createdAt
-    ? new Date(item.createdAt).toLocaleDateString()
-    : null;
 
   return (
     <div className="card">
@@ -25,12 +34,7 @@ const ContentCard = ({ item, onDelete }) => {
         <img
           src={item.image}
           alt="preview"
-          style={{
-            width: "100%",
-            borderRadius: "12px",
-            objectFit: "cover",
-            maxHeight: "220px"
-          }}
+          className="card-image"
         />
       )}
 
@@ -40,19 +44,10 @@ const ContentCard = ({ item, onDelete }) => {
 
       {item.aiSummary && <p>{item.aiSummary}</p>}
 
-      <div
-        style={{
-          marginTop: "auto",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          fontSize: "12px",
-          color: "#8b949e"
-        }}
-      >
+      <div className="card-footer">
         {formattedDate && <span>Saved on {formattedDate}</span>}
 
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div className="card-actions">
           <a
             href={item.url}
             target="_blank"
@@ -61,15 +56,7 @@ const ContentCard = ({ item, onDelete }) => {
             Open →
           </a>
 
-          <button
-            onClick={handleDelete}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#ef4444",
-              cursor: "pointer"
-            }}
-          >
+          <button className="delete-btn" onClick={handleDelete}>
             Delete
           </button>
         </div>

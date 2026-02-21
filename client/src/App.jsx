@@ -6,7 +6,6 @@ import "./index.css";
 const params = new URLSearchParams(window.location.search);
 const PHONE = params.get("user");
 
-// 🔥 Production Backend URL
 const BASE_URL = "https://social-saver-backend.onrender.com";
 
 function App() {
@@ -16,19 +15,17 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ===============================
-  // Fetch ALL content for this user
-  // ===============================
+  /* ================================
+     Fetch All Content
+  ================================ */
   const fetchData = async () => {
     if (!PHONE) return;
 
     try {
       setLoading(true);
-
       const res = await axios.get(
         `${BASE_URL}/dashboard/all/${PHONE}`
       );
-
       setData(res.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -37,9 +34,9 @@ function App() {
     }
   };
 
-  // ===============================
-  // Fetch categories for this user
-  // ===============================
+  /* ================================
+     Fetch Categories
+  ================================ */
   const fetchCategories = async () => {
     if (!PHONE) return;
 
@@ -47,21 +44,21 @@ function App() {
       const res = await axios.get(
         `${BASE_URL}/dashboard/categories/${PHONE}`
       );
-
       setCategories(res.data);
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
   };
 
-  // ===============================
-  // Search
-  // ===============================
+  /* ================================
+     Search
+  ================================ */
   const searchData = async () => {
     if (!PHONE || !search.trim()) return;
 
     try {
       setLoading(true);
+      setSelectedCategory("");
 
       const res = await axios.get(
         `${BASE_URL}/dashboard/search/${PHONE}?q=${search}`
@@ -75,13 +72,14 @@ function App() {
     }
   };
 
-  // ===============================
-  // Filter by category
-  // ===============================
+  /* ================================
+     Filter by Category
+  ================================ */
   const filterCategory = async (cat) => {
     if (!PHONE) return;
 
     setSelectedCategory(cat);
+    setSearch("");
 
     if (cat === "") {
       fetchData();
@@ -90,11 +88,9 @@ function App() {
 
     try {
       setLoading(true);
-
       const res = await axios.get(
         `${BASE_URL}/dashboard/category/${PHONE}/${cat}`
       );
-
       setData(res.data);
     } catch (error) {
       console.error("Category filter failed:", error);
@@ -103,15 +99,14 @@ function App() {
     }
   };
 
-  // ===============================
-  // Random
-  // ===============================
+  /* ================================
+     Random
+  ================================ */
   const randomItem = async () => {
     if (!PHONE) return;
 
     try {
       setLoading(true);
-
       const res = await axios.get(
         `${BASE_URL}/dashboard/random/${PHONE}`
       );
@@ -126,6 +121,13 @@ function App() {
     }
   };
 
+  /* ================================
+     Delete
+  ================================ */
+  const handleDelete = (id) => {
+    setData((prev) => prev.filter((item) => item._id !== id));
+  };
+
   useEffect(() => {
     if (PHONE) {
       fetchData();
@@ -133,9 +135,9 @@ function App() {
     }
   }, []);
 
-  // ===============================
-  // UI
-  // ===============================
+  /* ================================
+     UI
+  ================================ */
   return (
     <div className="container">
       <h1>📚 Social Saver Dashboard</h1>
@@ -148,10 +150,15 @@ function App() {
 
       {PHONE && (
         <>
+          {/* Total Count */}
+          <div className="total-count">
+            Total Saved: {data.length}
+          </div>
+
           <div className="controls">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search saved content..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -164,7 +171,8 @@ function App() {
               value={selectedCategory}
               onChange={(e) => filterCategory(e.target.value)}
             >
-              <option value="">Filter by Category</option>
+              <option value="">All Categories</option>
+
               {categories.map((cat, index) => (
                 <option key={index} value={cat}>
                   {cat}
@@ -180,14 +188,12 @@ function App() {
           ) : (
             <div className="cards">
               {data.map((item) => (
-  <ContentCard
-    key={item._id}
-    item={item}
-    onDelete={(id) =>
-      setData((prev) => prev.filter((x) => x._id !== id))
-    }
-  />
-))}
+                <ContentCard
+                  key={item._id}
+                  item={item}
+                  onDelete={handleDelete}
+                />
+              ))}
             </div>
           )}
         </>
