@@ -1,166 +1,106 @@
-📚 Social Saver
+# 🚀 Social Saver
 
-Social Saver is an AI-powered Telegram bot that transforms saved social media links into a searchable personal knowledge dashboard.
+> 📚 Turn your saved social media into an AI-powered personal knowledge base.
 
-Users send Instagram Reels, X (Twitter) posts, or blog URLs to the bot. The system extracts metadata, understands context (including sarcasm and meme tone), categorizes the content using AI, generates a concise English summary, and stores everything in a user-isolated dashboard.
+Social Saver is an intelligent Telegram bot that converts Instagram Reels, X (Twitter) posts, and blog links into a searchable, categorized dashboard powered by AI.
 
-🚀 Live
+It understands tone, sarcasm, meme culture, and multilingual content — then generates a concise English summary and stores it in a personal dashboard.
 
-Telegram Bot: https://t.me/YOUR_BOT_USERNAME
+---
 
-Dashboard: https://social-saver-frontend.onrender.com
+## 🌐 Live
 
-🏗 System Architecture
-┌─────────────────────────────┐
-│        Telegram User        │
-└──────────────┬──────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│      Telegram Bot API       │
-└──────────────┬──────────────┘
-               │ Webhook
-               ▼
-┌────────────────────────────────────┐
-│        Express Backend (Node)      │
-│------------------------------------│
-│ • Platform Detection               │
-│ • Metadata Extraction (Microlink)  │
-│ • AI Analysis (Gemini 2.5 Flash)   │
-│ • Content Categorization           │
-└──────────────┬─────────────────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│       MongoDB Atlas         │
-│ • User-specific storage     │
-│ • Categories & summaries    │
-└──────────────┬──────────────┘
-               │ REST API
-               ▼
-┌─────────────────────────────┐
-│    React Dashboard (Vite)   │
-│ • Search                    │
-│ • Category Filter           │
-│ • Random Discovery          │
-└─────────────────────────────┘
-🔄 User Flow
+🤖 **Telegram Bot:**  
+https://t.me/YOUR_BOT_USERNAME  
 
-User opens Telegram bot
+📊 **Dashboard:**  
+https://social-saver-frontend.onrender.com  
 
-Sends /start
+---
 
-Sends a social media link
+## ✨ Features
 
-Backend extracts metadata
+- 🤖 AI-powered content analysis (Gemini 2.5 Flash)
+- 🧠 Sarcasm & meme-aware summarization
+- 🏷 Dynamic smart categorization
+- 🔐 User-isolated content storage
+- 🔎 Search functionality
+- 🗂 Category filtering
+- 🎲 Random discovery feature
+- ☁️ Fully deployed (Backend + Frontend)
 
-Gemini AI analyzes:
+---
 
-Meaning
-
-Tone (sarcasm / satire / meme)
-
-Category
-
-One-line English summary
-
-Content stored in MongoDB (isolated per Telegram user)
-
-Bot returns:
-
-Category
-
-Summary
-
-Dashboard link
-
-User views saved content in personal dashboard
-
-✨ Features
-
-AI-powered content categorization
-
-Sarcasm and meme-aware summarization
-
-Dynamic category generation
-
-User-isolated storage model
-
-Search functionality
-
-Category filtering
-
-Random inspiration feature
-
-Fully deployed backend and frontend
-
-🛠 Tech Stack
-Backend
-
-Node.js
-
-Express.js
-
-MongoDB Atlas
-
-Mongoose
-
-Gemini 2.5 Flash (Google Generative AI)
-
-Frontend
-
-React (Vite)
-
-Axios
-
-Custom CSS
-
-Deployment
-
-Render (Backend & Static Site)
-
+## 🏗 System Architecture
+Telegram User
+│
+▼
 Telegram Bot API
+│ (Webhook)
+▼
+Express Backend (Node.js)
+├── Platform Detection
+├── Metadata Extraction (Microlink)
+├── AI Analysis (Gemini 2.5 Flash)
+└── Content Categorization
+│
+▼
+MongoDB Atlas
+│ (REST API)
+▼
+React Dashboard (Vite)
+├── Search
+├── Category Filter
+└── Random Discovery
 
-🔐 Data Model (MongoDB)
+
+---
+
+## 🔄 User Flow
+
+1️⃣ User opens Telegram bot  
+2️⃣ Sends `/start`  
+3️⃣ Sends a social media link  
+4️⃣ Backend extracts metadata  
+5️⃣ Gemini AI analyzes tone & meaning  
+6️⃣ Content stored in MongoDB (user-isolated)  
+7️⃣ Bot replies with:
+   - Category  
+   - AI summary  
+   - Dashboard link  
+8️⃣ User views saved content in dashboard  
+
+---
+
+## 🛠 Tech Stack
+
+### 🔧 Backend
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- Gemini 2.5 Flash (Google Generative AI)
+
+### 🎨 Frontend
+- React (Vite)
+- Axios
+- Custom CSS
+
+### ☁️ Deployment
+- Render (Backend & Static Site)
+- Telegram Bot API
+
+---
+
+## 🔐 Data Model
+
+```json
 {
-  userPhone: "telegram_chat_id",
-  url: "...",
-  caption: "...",
-  aiSummary: "...",
-  category: "...",
-  image: "...",
-  createdAt: ...
+  "userPhone": "telegram_chat_id",
+  "url": "...",
+  "caption": "...",
+  "aiSummary": "...",
+  "category": "...",
+  "image": "...",
+  "createdAt": "timestamp"
 }
-
-All queries are filtered by userPhone to ensure user isolation.
-
-📦 Local Setup
-Backend
-npm install
-npm start
-
-Create a .env file:
-
-MONGODB_URI=
-GEMINI_API_KEY=
-TELEGRAM_BOT_TOKEN=
-PORT=5000
-Frontend
-cd client
-npm install
-npm run dev
-
-
-📈 Future Improvements
-
-Advanced analytics dashboard
-
-Browser extension
-
-WhatsApp integration
-
-RAG-based real-time news enrichment
-
-👨‍💻 Author
-
-Yashwanth Kumar S B
