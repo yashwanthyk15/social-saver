@@ -33,25 +33,25 @@ https://social-saver-frontend.onrender.com
 
 ## 🏗 System Architecture
 Telegram User
-│
-▼
+      │
+      ▼
 Telegram Bot API
-│ (Webhook)
-▼
+      │ (Webhook)
+      ▼
 Express Backend (Node.js)
-├── Platform Detection
-├── Metadata Extraction (Microlink)
-├── AI Analysis (Gemini 2.5 Flash)
-└── Content Categorization
-│
-▼
+      ├── Platform Detection
+      ├── Metadata Extraction (Microlink)
+      ├── AI Analysis (Gemini 2.5 Flash)
+      └── Content Categorization
+      │
+      ▼
 MongoDB Atlas
-│ (REST API)
-▼
+      │ (REST API)
+      ▼
 React Dashboard (Vite)
-├── Search
-├── Category Filter
-└── Random Discovery
+      ├── Search
+      ├── Category Filter
+      └── Random Discovery
 
 
 ---
@@ -104,3 +104,4 @@ React Dashboard (Vite)
   "image": "...",
   "createdAt": "timestamp"
 }
+
