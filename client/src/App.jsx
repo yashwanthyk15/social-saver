@@ -10,10 +10,15 @@ const BASE_URL = "https://social-saver-backend.onrender.com";
 
 function App() {
   const [data, setData] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   /* ================================
      Fetch All Content
@@ -27,6 +32,8 @@ function App() {
         `${BASE_URL}/dashboard/all/${PHONE}`
       );
       setData(res.data);
+      setAllData(res.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     } finally {
@@ -65,6 +72,7 @@ function App() {
       );
 
       setData(res.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error("Search failed:", error);
     } finally {
@@ -92,6 +100,7 @@ function App() {
         `${BASE_URL}/dashboard/category/${PHONE}/${cat}`
       );
       setData(res.data);
+      setCurrentPage(1);
     } catch (error) {
       console.error("Category filter failed:", error);
     } finally {
@@ -100,32 +109,16 @@ function App() {
   };
 
   /* ================================
-     Random
+     Pagination Logic
   ================================ */
-  const randomItem = async () => {
-    if (!PHONE) return;
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentItems = data.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(data.length / itemsPerPage);
 
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/random/${PHONE}`
-      );
-
-      if (res.data && !res.data.message) {
-        setData([res.data]);
-      }
-    } catch (error) {
-      console.error("Random fetch failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================================
-     Delete
-  ================================ */
   const handleDelete = (id) => {
-    setData((prev) => prev.filter((item) => item._id !== id));
+    const updated = data.filter((item) => item._id !== id);
+    setData(updated);
   };
 
   useEffect(() => {
@@ -142,15 +135,8 @@ function App() {
     <div className="container">
       <h1>📚 Social Saver Dashboard</h1>
 
-      {!PHONE && (
-        <div className="empty">
-          Invalid dashboard link. Please access from Telegram.
-        </div>
-      )}
-
       {PHONE && (
         <>
-          {/* Total Count */}
           <div className="total-count">
             Total Saved: {data.length}
           </div>
@@ -165,36 +151,58 @@ function App() {
 
             <button onClick={searchData}>Search</button>
             <button onClick={fetchData}>All</button>
-            <button onClick={randomItem}>🎲 Random</button>
 
             <select
               value={selectedCategory}
               onChange={(e) => filterCategory(e.target.value)}
             >
               <option value="">All Categories</option>
+              {categories.map((cat, index) => {
+                const count = allData.filter(
+                  (item) => item.category === cat
+                ).length;
 
-              {categories.map((cat, index) => (
-                <option key={index} value={cat}>
-                  {cat}
-                </option>
-              ))}
+                return (
+                  <option key={index} value={cat}>
+                    {cat} ({count})
+                  </option>
+                );
+              })}
             </select>
           </div>
 
           {loading ? (
             <div className="empty">Loading...</div>
-          ) : data.length === 0 ? (
-            <div className="empty">No saved content yet.</div>
           ) : (
-            <div className="cards">
-              {data.map((item) => (
-                <ContentCard
-                  key={item._id}
-                  item={item}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
+            <>
+              <div className="cards fade-in">
+                {currentItems.map((item) => (
+                  <ContentCard
+                    key={item._id}
+                    item={item}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+
+              {totalPages > 1 && (
+                <div className="pagination">
+                  {[...Array(totalPages)].map((_, index) => (
+                    <button
+                      key={index}
+                      className={
+                        currentPage === index + 1
+                          ? "active-page"
+                          : ""
+                      }
+                      onClick={() => setCurrentPage(index + 1)}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </>
       )}

@@ -3,25 +3,24 @@ import axios from "axios";
 
 const BASE_URL = "https://social-saver-backend.onrender.com";
 
-const ContentCard = ({ item, onDelete }) => {
-  if (!item) return null;
+const platformIcon = (platform) => {
+  if (platform === "instagram") return "📸";
+  if (platform === "twitter") return "🐦";
+  return "🔗";
+};
 
+const ContentCard = ({ item, onDelete }) => {
   const formattedDate = item.createdAt
     ? new Date(item.createdAt).toLocaleDateString()
     : null;
 
   const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this item?"
-    );
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete this item?")) return;
 
     try {
       await axios.delete(
         `${BASE_URL}/dashboard/delete/${item._id}`
       );
-
       onDelete(item._id);
     } catch (error) {
       console.error("Delete failed:", error);
@@ -38,14 +37,14 @@ const ContentCard = ({ item, onDelete }) => {
         />
       )}
 
-      {item.category && (
-        <div className="badge">{item.category}</div>
-      )}
+      <div className="badge">
+        {platformIcon(item.platform)} {item.category}
+      </div>
 
-      {item.aiSummary && <p>{item.aiSummary}</p>}
+      <p>{item.aiSummary}</p>
 
       <div className="card-footer">
-        {formattedDate && <span>Saved on {formattedDate}</span>}
+        <span>{formattedDate}</span>
 
         <div className="card-actions">
           <a
