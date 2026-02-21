@@ -14,6 +14,14 @@ body {
 }
 
 /* ===== LAYOUT ===== */
+.total-count {
+  text-align: center;
+  margin-top: -25px;   /* pulls it closer to heading */
+  margin-bottom: 40px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #9aa4b2;
+}
 
 .container {
   max-width: 1200px;

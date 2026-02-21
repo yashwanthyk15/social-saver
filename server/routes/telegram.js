@@ -49,6 +49,8 @@ Just paste a link to begin 🚀
 
 🔐 *Your private dashboard (valid for 7 days):*
 https://social-saver-yk.onrender.com/?token=${token}
+"I recommend you to pin this msg(link) for easy access"
+
 
 ⚠ After 7 days, this link will expire.
 Simply type /start again to get a new secure link.`
@@ -104,17 +106,13 @@ Simply type /start again to get a new secure link.`
     await newContent.save();
 
     // ✅ Smart reply
-    await axios.post(
+   await axios.post(
   `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
   {
     chat_id: chatId,
-    parse_mode: "Markdown",
-    text: `✅ *Saved to ${aiResult.category}*
+    text: `✅ Saved to ${aiResult.category}
 
-📝 ${aiResult.summary}
-
-🔗 *View your dashboard:*
-https://social-saver-yk.onrender.com/?user=${chatId}`
+📝 ${aiResult.summary}`
   }
 );
 
