@@ -1,7 +1,4 @@
 import React from "react";
-import axios from "axios";
-
-const BASE_URL = "https://social-saver-backend.onrender.com";
 
 const platformIcon = (platform) => {
   if (platform === "instagram") return "📸";
@@ -14,17 +11,9 @@ const ContentCard = ({ item, onDelete }) => {
     ? new Date(item.createdAt).toLocaleDateString()
     : "";
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
     if (!window.confirm("Delete this item?")) return;
-
-    try {
-      await axios.delete(
-        `${BASE_URL}/dashboard/delete/${item._id}`
-      );
-      onDelete(item._id);
-    } catch (error) {
-      console.error("Delete failed:", error);
-    }
+    onDelete(item._id);   // 👈 Let App handle API call
   };
 
   return (
@@ -57,7 +46,7 @@ const ContentCard = ({ item, onDelete }) => {
 
         <button
           className="delete-btn"
-          onClick={handleDelete}
+          onClick={handleDeleteClick}
         >
           Delete
         </button>
