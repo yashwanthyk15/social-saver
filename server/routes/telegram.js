@@ -33,7 +33,6 @@ if (incomingMsg === "/start") {
     `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
     {
       chat_id: chatId,
-      parse_mode: "Markdown",
       text: `👋 *Welcome to Social Saver!*
 
 Send me:
