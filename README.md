@@ -16,7 +16,6 @@ https://t.me/social_saver_yk_bot
  A private dashboard will be generated with you click on start
 
 **Explaination(video):**
-
 https://drive.google.com/file/d/13XxL2ao0DGIGd6JLL5c8L2MpCJAh5xLN/view?usp=sharing
 
 ---
@@ -107,6 +106,7 @@ React Dashboard (Vite)
   "image": "...",
   "createdAt": "timestamp"
 }
+
 
 
 
