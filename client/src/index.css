@@ -12,15 +12,7 @@ body {
   --card-bg: #161b22;
   --border: #2d333b;
 }
-.controls button:nth-child(4) {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border: none;
-  color: white;
-}
 
-.controls button:nth-child(4):hover {
-  transform: translateY(-2px) scale(1.03);
-}
 
 /* ===== LAYOUT ===== */
 .total-count {

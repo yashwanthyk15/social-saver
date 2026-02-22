@@ -244,7 +244,7 @@ function App() {
   <button onClick={fetchData}>All</button>
 
   <button onClick={getRandomInspiration}>
-    ✨ Random Inspiration
+     Random 
   </button>
 
   <select
