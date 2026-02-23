@@ -13,7 +13,7 @@ It understands tone, sarcasm, meme culture, and multilingual content — then ge
 🤖 **Telegram Bot:**  
 https://t.me/social_saver_yk_bot
 
- A private dashboard will be generated with you click on start
+ A private dashboard will be generated when you click on start
 
 **Explaination(video):**
 https://drive.google.com/file/d/13XxL2ao0DGIGd6JLL5c8L2MpCJAh5xLN/view?usp=sharing
@@ -34,26 +34,24 @@ https://drive.google.com/file/d/13XxL2ao0DGIGd6JLL5c8L2MpCJAh5xLN/view?usp=shari
 ---
 
 ## 🏗 System Architecture
-Telegram User
-      │
-      ▼
-Telegram Bot API
-      │ (Webhook)
-      ▼
-Express Backend (Node.js)
-      ├── Platform Detection
-      ├── Metadata Extraction (Microlink)
-      ├── AI Analysis (Gemini 2.5 Flash)
-      └── Content Categorization
-      │
-      ▼
-MongoDB Atlas
-      │ (REST API)
-      ▼
-React Dashboard (Vite)
-      ├── Search
-      ├── Category Filter
-      └── Random Discovery
+
+### Flow Overview
+
+1. **Telegram User**
+2. **Telegram Bot API**
+   - Webhook-based communication
+3. **Express Backend (Node.js)**
+   - Platform Detection  
+   - Metadata Extraction (Microlink)  
+   - AI Analysis (Gemini 2.5 Flash)  
+   - Content Categorization
+4. **MongoDB Atlas**
+   - Stores metadata, analysis results, and categories
+5. **REST API Layer**
+6. **React Dashboard (Vite)**
+   - Search  
+   - Category Filter  
+   - Random Discovery
 
 
 ---
@@ -106,6 +104,7 @@ React Dashboard (Vite)
   "image": "...",
   "createdAt": "timestamp"
 }
+
 
 
 
