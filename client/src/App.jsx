@@ -1,211 +1,140 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import ContentCard from "./components/ContentCard";
-import "./index.css";
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import { Search, X, LayoutGrid, Star, Shuffle } from 'lucide-react';
+import { setToken, api } from './utils/api';
+import { useContent } from './hooks/useContent';
+import Navbar from './components/Navbar';
+import ContentCard from './components/ContentCard';
+import SkeletonCard from './components/SkeletonCard';
+import StatsPanel from './components/StatsPanel';
+import EmptyState from './components/EmptyState';
+import './index.css';
+import { getToken } from './utils/api';
 
+// ── Read token from URL query param or localStorage ──
 const params = new URLSearchParams(window.location.search);
-const TOKEN = params.get("token");
+const urlToken = params.get('token');
+if (urlToken) {
+  setToken(urlToken);
+  // Remove token from URL to prevent accidental sharing
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+const TOKEN = getToken();
 
-const BASE_URL = "https://social-saver-backend.onrender.com";
+export default function App() {
+  const {
+    items, total, loading, error,
+    fetchAll, search, filterCategory, fetchFavorites, getRandom,
+    deleteItem, toggleFavorite, updateNote,
+  } = useContent();
 
-function App() {
-  const [data, setData] = useState([]);
-  const [allData, setAllData] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [sessionExpired, setSessionExpired] = useState(false);
+  const [categories,    setCategories]    = useState([]);
+  const [selectedCat,   setSelectedCat]   = useState('');
+  const [activeView,    setActiveView]    = useState('all');
+  const [searchQuery,   setSearchQuery]   = useState('');
+  const [page,          setPage]          = useState(1);
+  const [totalPages,    setTotalPages]    = useState(1);
+  const [sessionExpired,setSessionExpired]= useState(false);
+  const [showStats,     setShowStats]     = useState(false);
+  const [theme,         setTheme]         = useState(() =>
+    localStorage.getItem('ss-theme') || 'dark'
+  );
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const searchRef = useRef(null);
 
-  const config = {
-    headers: {
-      Authorization: `Bearer ${TOKEN}`
-    }
-  };
-
-  /* ================================
-     Fetch All Content
-  ================================ */
-  const fetchData = async () => {
-    if (!TOKEN) return;
-
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/all`,
-        config
-      );
-      setData(res.data);
-      setAllData(res.data);
-      setCurrentPage(1);
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Failed to fetch data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================================
-     Fetch Categories
-  ================================ */
-  const fetchCategories = async () => {
-    if (!TOKEN) return;
-
-    try {
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/categories`,
-        config
-      );
-      setCategories(res.data);
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Failed to fetch categories:", error);
-    }
-  };
-
-  /* ================================
-     Search
-  ================================ */
-  const searchData = async () => {
-    if (!TOKEN || !search.trim()) return;
-
-    try {
-      setLoading(true);
-      setSelectedCategory("");
-
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/search?q=${search}`,
-        config
-      );
-
-      setData(res.data);
-      setCurrentPage(1);
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Search failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================================
-     Filter by Category
-  ================================ */
-  const filterCategory = async (cat) => {
-    if (!TOKEN) return;
-
-    setSelectedCategory(cat);
-    setSearch("");
-
-    if (cat === "") {
-      fetchData();
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/category/${cat}`,
-        config
-      );
-
-      setData(res.data);
-      setCurrentPage(1);
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Category filter failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================================
-     Random Inspiration
-  ================================ */
-  const getRandomInspiration = async () => {
-    if (!TOKEN) return;
-
-    try {
-      setLoading(true);
-
-      const res = await axios.get(
-        `${BASE_URL}/dashboard/random`,
-        config
-      );
-
-      if (res.data && !res.data.message) {
-        setData([res.data]);   // show only random item
-        setCurrentPage(1);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Random failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* ================================
-     Delete
-  ================================ */
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(
-        `${BASE_URL}/dashboard/delete/${id}`,
-        config
-      );
-
-      setData((prev) =>
-        prev.filter((item) => item._id !== id)
-      );
-    } catch (error) {
-      if (error.response?.status === 403) {
-        setSessionExpired(true);
-      }
-      console.error("Delete failed:", error);
-    }
-  };
-
-  /* ================================
-     Pagination
-  ================================ */
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const currentItems = data.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(data.length / itemsPerPage);
-
+  // ── Apply theme to <html> ──
   useEffect(() => {
-    if (TOKEN) {
-      fetchData();
-      fetchCategories();
-    }
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('ss-theme', theme);
+  }, [theme]);
+
+  // ── Session-expired global event from api.js interceptor ──
+  useEffect(() => {
+    const h = () => setSessionExpired(true);
+    window.addEventListener('session-expired', h);
+    return () => window.removeEventListener('session-expired', h);
   }, []);
 
-  /* ================================
-     UI
-  ================================ */
+  // ── Initial data load ──
+  useEffect(() => {
+    if (!TOKEN) return;
+    doLoadAll(1);
+    loadCategories();
+  }, []);
+
+  // ────────────────────────────────────────────
+  // Data helpers
+  // ────────────────────────────────────────────
+  const doLoadAll = async (p = 1) => {
+    const res = await fetchAll(p);
+    if (res) { setTotalPages(res.totalPages || 1); setPage(p); }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const res = await api.get('/dashboard/categories');
+      setCategories(res.data);
+    } catch { /* non-fatal */ }
+  };
+
+  // ────────────────────────────────────────────
+  // View / filter actions
+  // ────────────────────────────────────────────
+  const switchView = useCallback(async (view) => {
+    setActiveView(view);
+    setSelectedCat('');
+    setSearchQuery('');
+    if (view === 'all')       { doLoadAll(1); }
+    else if (view === 'favorites') { fetchFavorites(); }
+    else if (view === 'random')    { getRandom(); }
+  }, [fetchFavorites, getRandom]);
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) return doLoadAll(1);
+    setActiveView('all');
+    setSelectedCat('');
+    search(searchQuery);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    doLoadAll(1);
+    setTimeout(() => searchRef.current?.focus(), 0);
+  };
+
+  const handleCatFilter = (cat) => {
+    setSelectedCat(cat);
+    setActiveView('all');
+    setSearchQuery('');
+    filterCategory(cat);
+  };
+
+  const handlePage = (p) => {
+    doLoadAll(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const emptyView = searchQuery
+    ? 'search'
+    : activeView === 'favorites'
+    ? 'favorites'
+    : selectedCat
+    ? 'category'
+    : 'all';
+
+  // ────────────────────────────────────────────
+  // Guard screens
+  // ────────────────────────────────────────────
   if (!TOKEN) {
     return (
-      <div className="container">
-        <div className="empty">
-          Invalid dashboard link. Please restart the bot.
+      <div className="guard-screen">
+        <div className="guard-box">
+          <div className="guard-icon">🔐</div>
+          <h2>Access Required</h2>
+          <p>
+            Open your Telegram bot and send <code>/start</code> to
+            receive your private dashboard link.
+          </p>
         </div>
       </div>
     );
@@ -213,96 +142,169 @@ function App() {
 
   if (sessionExpired) {
     return (
-      <div className="container">
-        <div className="empty">
-          🔐 Your session has expired.
-          <br />
-          Please go back to Telegram and type <b>/start</b> to get a new secure link.
+      <div className="guard-screen">
+        <div className="guard-box">
+          <div className="guard-icon">⏰</div>
+          <h2>Session Expired</h2>
+          <p>
+            Your 7-day session has ended. Go to Telegram and
+            send <code>/start</code> to get a new secure link.
+          </p>
         </div>
       </div>
     );
   }
 
+  // ────────────────────────────────────────────
+  // Main UI
+  // ────────────────────────────────────────────
   return (
-    <div className="container">
-      <h1>📚 Social Saver Dashboard</h1>
-
-      <div className="total-count">
-        Total Saved: {allData.length}
+    <>
+      <div className="bg-blobs">
+        <div className="blob blob-1"></div>
+        <div className="blob blob-2"></div>
+        <div className="blob blob-3"></div>
       </div>
+      
+      <Navbar
+        total={total}
+        onShowStats={() => setShowStats(true)}
+        theme={theme}
+        onToggleTheme={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+      />
 
-      <div className="controls">
-  <input
-    type="text"
-    placeholder="Search saved content..."
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-  />
+      <main className="main-container">
 
-  <button onClick={searchData}>Search</button>
+        {/* ── Controls ── */}
+        <div className="controls-bar">
 
-  <button onClick={fetchData}>All</button>
-
-  <button onClick={getRandomInspiration}>
-     Random 
-  </button>
-
-  <select
-    value={selectedCategory}
-    onChange={(e) => filterCategory(e.target.value)}
-  >
-    <option value="">All Categories</option>
-    {categories.map((cat, index) => {
-      const count = allData.filter(
-        (item) => item.category === cat
-      ).length;
-
-      return (
-        <option key={index} value={cat}>
-          {cat} ({count})
-        </option>
-      );
-    })}
-  </select>
-</div>
-
-      {loading ? (
-        <div className="empty">Loading...</div>
-      ) : (
-        <>
-          <div className="cards fade-in">
-            {currentItems.map((item) => (
-              <ContentCard
-                key={item._id}
-                item={item}
-                onDelete={handleDelete}
+          {/* Search row */}
+          <div className="search-row">
+            <div className="search-wrap">
+              <span className="search-icon-wrap"><Search size={15} /></span>
+              <input
+                ref={searchRef}
+                type="text"
+                className="search-input"
+                placeholder="Search summaries, tags, categories…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
+              {searchQuery && (
+                <button className="search-clear" onClick={handleClearSearch} aria-label="Clear">
+                  <X size={13} />
+                </button>
+              )}
+              <button className="search-btn" onClick={handleSearch}>
+                <Search size={13} /> Search
+              </button>
+            </div>
+          </div>
+
+          {/* View tabs */}
+          <div className="view-tabs">
+            {[
+              { id: 'all',       icon: <LayoutGrid size={13} />, label: 'All'       },
+              { id: 'favorites', icon: <Star        size={13} />, label: 'Favorites' },
+              { id: 'random',    icon: <Shuffle     size={13} />, label: 'Random'    },
+            ].map(({ id, icon, label }) => (
+              <button
+                key={id}
+                className={`tab-btn ${activeView === id && !selectedCat && !searchQuery ? 'tab-active' : ''}`}
+                onClick={() => switchView(id)}
+              >
+                {icon} {label}
+              </button>
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="pagination">
-              {[...Array(totalPages)].map((_, index) => (
+          {/* Category chips */}
+          {categories.length > 0 && (
+            <div className="cat-chips-wrap">
+              <button
+                className={`chip ${!selectedCat ? 'chip-active' : ''}`}
+                onClick={() => handleCatFilter('')}
+              >
+                All
+              </button>
+              {categories.map((c, i) => (
                 <button
-                  key={index}
-                  className={
-                    currentPage === index + 1
-                      ? "active-page"
-                      : ""
-                  }
-                  onClick={() =>
-                    setCurrentPage(index + 1)
-                  }
+                  key={i}
+                  className={`chip ${selectedCat === c.name ? 'chip-active' : ''}`}
+                  onClick={() => handleCatFilter(c.name)}
                 >
-                  {index + 1}
+                  {c.name}
+                  <span className="chip-count">{c.count}</span>
                 </button>
               ))}
             </div>
           )}
-        </>
-      )}
-    </div>
+
+          {/* Results info */}
+          {!loading && items.length > 0 && (
+            <div className="results-info">
+              Showing <span className="results-count">{items.length}</span>
+              {total > items.length && <> of <span className="results-count">{total}</span></>}
+              {' '}item{items.length !== 1 ? 's' : ''}
+              {selectedCat && <> in <strong>{selectedCat}</strong></>}
+              {searchQuery && <> for "<strong>{searchQuery}</strong>"</>}
+            </div>
+          )}
+        </div>
+
+        {/* ── Error ── */}
+        {error && (
+          <div className="error-banner">⚠️ {error}</div>
+        )}
+
+        {/* ── Grid ── */}
+        {loading ? (
+          <div className="cards-grid">
+            {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : items.length === 0 ? (
+          <EmptyState view={emptyView} />
+        ) : (
+          <div className="cards-grid fade-in">
+            {items.map((item) => (
+              <ContentCard
+                key={item._id}
+                item={item}
+                onDelete={deleteItem}
+                onToggleFavorite={toggleFavorite}
+                onUpdateNote={updateNote}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* ── Pagination ── */}
+        {totalPages > 1 && activeView === 'all' && !searchQuery && !selectedCat && (
+          <div className="pagination">
+            <button className="page-btn" disabled={page === 1} onClick={() => handlePage(page - 1)}>
+              ← Prev
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                className={`page-btn ${page === p ? 'page-active' : ''}`}
+                onClick={() => handlePage(p)}
+              >
+                {p}
+              </button>
+            ))}
+            <button className="page-btn" disabled={page === totalPages} onClick={() => handlePage(page + 1)}>
+              Next →
+            </button>
+          </div>
+        )}
+      </main>
+
+      {/* ── Stats Modal ── */}
+      <AnimatePresence>
+        {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
+      </AnimatePresence>
+    </>
   );
 }
-
-export default App;

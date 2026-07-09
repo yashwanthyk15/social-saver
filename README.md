@@ -1,132 +1,81 @@
-# 🚀 Social Saver
+# 🤖 Social Saver V3
 
-We all do it.You’re scrolling through Instagram and find a great workout, a design tip, or a coding hack.
-You hit Save… and never open it again.
-Saved content gets buried in hidden folders — lost, forgotten, and unused.
-
-💡 Solution
-
-📚 Turn your saved social media into an AI-powered personal knowledge base
-
-Social Saver is an intelligent Telegram bot that transforms saved content into something you’ll actually use.
-
-It:
-
-📥 Accepts Instagram Reels, X (Twitter) posts, and blog links
-
-🧠 Uses AI to analyze and categorize content
-
-🔎 Stores everything in a searchable dashboard
-
-📊 Helps you rediscover valuable content when you need it
-
-No more forgotten saves.
-Your knowledge — organized, searchable, and useful.
-
----
-
-
-## 🌐 Live
-
-🤖 **Telegram Bot:**  
-https://t.me/social_saver_yk_bot
-
- A private dashboard will be generated when you click on start
-
-
+An AI-powered personal knowledge base that lives directly in your Telegram app. Send any link, article, video, or post, and Social Saver will automatically extract, analyze, and categorize it for you, beautifully presented on a sleek Web Dashboard.
 
 ## ✨ Features
 
-- 🤖 AI-powered content analysis (Gemini 2.5 Flash)
-- 🧠 Sarcasm & meme-aware summarization
-- 🏷 Dynamic smart categorization
-- 🔐 User-isolated content storage
-- 🔎 Search functionality
-- 🗂 Category filtering
-- 🎲 Random discovery feature
-- ☁️ Fully deployed (Backend + Frontend)
+- **🧠 AI Summarization:** Automatically reads and summarizes long articles, YouTube videos, and social media posts using Google Gemini AI.
+- **🏷 Smart Categorization:** AI automatically tags and categorizes your content so you don't have to organize anything manually.
+- **📱 Telegram Integration:** No apps to install. Just forward or paste links directly into your personal Telegram bot.
+- **🎨 Sleek Spatial UI:** A gorgeous, professional dark-mode web dashboard with glassmorphism, 3D interactive elements, and lightning-fast search.
+- **🔒 Secure & Private:** Authenticate to your dashboard via secure magic links directly from your Telegram bot.
 
----
+## 🚀 Tech Stack
 
-## 🏗 System Architecture
+- **Frontend:** React, Vite, Framer Motion, Vanilla CSS (Professional Glassmorphism)
+- **Backend:** Node.js, Express, MongoDB (Mongoose)
+- **AI Engine:** Google Gemini Pro (`@google/generative-ai`)
+- **Bot Integration:** Telegram Bot API
+- **Link Extraction:** Custom meta-scrapers and platform-specific resolvers
 
-### Flow Overview
+## 🛠 Setup & Installation
 
-1. **Telegram User**
-2. **Telegram Bot API**
-   - Webhook-based communication
-3. **Express Backend (Node.js)**
-   - Platform Detection  
-   - Metadata Extraction (Microlink)  
-   - AI Analysis (Gemini 2.5 Flash)  
-   - Content Categorization
-4. **MongoDB Atlas**
-   - Stores metadata, analysis results, and categories
-5. **REST API Layer**
-6. **React Dashboard (Vite)**
-   - Search  
-   - Category Filter  
-   - Random Discovery
+### 1. Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas cluster (make sure your IP is whitelisted!)
+- A Telegram Bot Token (from [@BotFather](https://t.me/botfather))
+- A Google Gemini API Key
 
+### 2. Environment Variables
+Create a `.env` file in the root directory:
+```env
+# Telegram
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 
----
+# AI
+GEMINI_API_KEY=your_gemini_api_key
 
-## 🔄 User Flow
+# Database
+MONGO_URI=mongodb+srv://user:password@cluster...
 
-1️⃣ User opens Telegram bot  
-2️⃣ Sends `/start`  
-3️⃣ Sends a social media link  
-4️⃣ Backend extracts metadata  
-5️⃣ Gemini AI analyzes tone & meaning  
-6️⃣ Content stored in MongoDB (user-isolated)  
-7️⃣ Bot replies with:
-   - Category  
-   - AI summary  
-   - Dashboard link  
-8️⃣ User views saved content in dashboard  
+# Auth
+JWT_SECRET=your_super_secret_jwt_key
 
----
+# App
+PORT=3000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5000
+```
 
-## 🛠 Tech Stack
+### 3. Run Locally
+**Install dependencies (Backend):**
+```bash
+npm install
+```
 
-### 🔧 Backend
-- Node.js
-- Express.js
-- MongoDB Atlas
-- Mongoose
-- Gemini 2.5 Flash (Google Generative AI)
+**Install dependencies (Frontend):**
+```bash
+cd client
+npm install
+```
 
-### 🎨 Frontend
-- React (Vite)
-- Axios
-- Custom CSS
+**Start the Development Servers:**
+```bash
+# Terminal 1 (Backend)
+npm run dev
 
-### ☁️ Deployment
-- Render (Backend & Static Site)
-- Telegram Bot API
+# Terminal 2 (Frontend)
+cd client
+npm run dev
+```
 
----
+The frontend will run on `http://localhost:5000` and proxy API requests to `http://localhost:3000`.
 
-## 🔐 Data Model
+## 📱 How to Use
+1. Send `/start` to your Telegram bot.
+2. The bot will send you a secure magic link to access your dashboard.
+3. Send any URL (YouTube, Twitter, Blogs) to the bot.
+4. Watch the AI instantly analyze and save it to your web dashboard!
 
-```json
-{
-  "userPhone": "telegram_chat_id",
-  "url": "...",
-  "caption": "...",
-  "aiSummary": "...",
-  "category": "...",
-  "image": "...",
-  "createdAt": "timestamp"
-}
-
-
-
-
-
-
-
-
-
-
-
+## 📄 License
+MIT License

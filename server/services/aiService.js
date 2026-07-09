@@ -1,93 +1,72 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const FALLBACK = {
+  category: "Uncategorized",
+  summary: "Could not analyze this content.",
+  tags: [],
+};
 
+/**
+ * Analyzes content text using Gemini Flash and returns
+ * { category, summary, tags }
+ */
 const analyzeContent = async (text) => {
+  if (!text || text.trim().length < 10) {
+    return FALLBACK;
+  }
+
   try {
-    if (!text || text.trim().length < 5) {
-      return {
-        category: "Uncategorized",
-        summary: "Content description not sufficient for AI analysis."
-      };
-    }
+    // Instantiate here so the API key is definitely loaded from .env
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash"
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-   const prompt = `
-You are an advanced content intelligence engine for a personal knowledge storage system.
+    const prompt = `You are an expert content intelligence engine for a personal knowledge base.
 
-Analyze the following content carefully and understand its core meaning.
+Analyze the following content and extract its meaning. Be concise and accurate.
 
 Rules:
-1. Focus on the main idea or topic of the content.
-2. Identify the central theme or purpose.
-3. Assign ONE accurate category.
-4. Generate ONE clear English sentence summary.
+1. CATEGORY: Assign ONE category. Use one of these if it fits exactly:
+   Fitness, Food, Coding, Travel, Business, Finance, Design, Education, Motivation, Entertainment, Science, Health, Art, Sports, Gaming, Productivity
+   If none fits, create a short 1-2 word custom category. Never use "Other" or "Misc".
 
-Category rules:
-• If it clearly fits one of these, use EXACTLY one:
-  Fitness, Food, Coding, Travel, Business, Finance, Design, Education, Motivation, Entertainment
+2. SUMMARY: Write ONE clear English sentence that captures the main idea. Be specific and informative, not vague.
 
-• Otherwise:
-  - Create a short meaningful category (max 2 words)
-  - Do NOT use vague labels like Other or Misc
+3. TAGS: Generate 2-4 short relevant keyword tags (lowercase, no spaces, hyphens allowed). Example: ["machine-learning", "python", "tutorial"]
 
-Summary rules:
-• Must be in English.
-• Must be one concise sentence.
-• Must clearly describe the main meaning of the content.
-
-Return ONLY valid JSON.
-No markdown.
-No explanation.
-No extra text.
+Return ONLY valid JSON. No markdown. No code blocks. No extra text.
 
 Format:
 {
   "category": "CategoryName",
-  "summary": "One clear sentence summarizing the content."
+  "summary": "One clear descriptive sentence.",
+  "tags": ["tag1", "tag2", "tag3"]
 }
 
 Content:
-${text}
-`;
+${text.substring(0, 2000)}`;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const rawText = response.text();
+    const rawText = result.response.text().replace(/```json|```/g, "").trim();
 
-    const cleanText = rawText
-      .replace(/```json/g, "")
-      .replace(/```/g, "")
-      .trim();
+    const parsed = JSON.parse(rawText);
 
-    try {
-      const parsed = JSON.parse(cleanText);
-
-      if (!parsed.category || !parsed.summary) {
-        throw new Error("Missing required fields");
-      }
-
-      return parsed;
-
-    } catch (parseError) {
-      console.error("⚠️ Gemini returned invalid JSON:", cleanText);
-
-      return {
-        category: "Uncategorized",
-        summary: "AI response formatting issue."
-      };
+    if (!parsed.category || !parsed.summary) {
+      throw new Error("Missing required fields in AI response");
     }
 
-  } catch (error) {
-    console.error("❌ Gemini FULL ERROR:", error);
-
     return {
-      category: "AI Error",
-      summary: "AI service temporarily unavailable."
+      category: String(parsed.category).substring(0, 50),
+      summary: String(parsed.summary).substring(0, 300),
+      tags: Array.isArray(parsed.tags)
+        ? parsed.tags
+            .slice(0, 5)
+            .map((t) => String(t).toLowerCase().replace(/\s+/g, "-").substring(0, 30))
+        : [],
     };
+  } catch (error) {
+    console.error("❌ AI Analysis Error:", error.message);
+    return FALLBACK;
   }
 };
 

@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "No token provided" });
   }
 
@@ -14,8 +14,15 @@ const authMiddleware = (req, res, next) => {
     req.userPhone = decoded.userPhone;
     next();
   } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(403).json({
+        error: "Session expired. Please type /start in Telegram to get a new link.",
+        code: "TOKEN_EXPIRED",
+      });
+    }
     return res.status(403).json({
-      error: "Session expired. Please restart the bot to get a new link."
+      error: "Invalid session token.",
+      code: "TOKEN_INVALID",
     });
   }
 };
