@@ -23,7 +23,8 @@ function generateToken(chatId) {
 
 function getDashboardLink(chatId) {
   const token = generateToken(chatId);
-  return `${FRONTEND_URL}/?token=${token}`;
+  const baseUrl = FRONTEND_URL.endsWith('/') ? FRONTEND_URL.slice(0, -1) : FRONTEND_URL;
+  return `${baseUrl}/?token=${token}`;
 }
 
 // ─────────────────────────────────────────────
