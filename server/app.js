@@ -15,7 +15,10 @@ app.use(helmet({
 // ── CORS ──
 // In dev, allow localhost on any port. In prod, restrict to FRONTEND_URL.
 const getAllowedOrigins = () => {
-  const frontend = process.env.FRONTEND_URL;
+  let frontend = process.env.FRONTEND_URL;
+  if (frontend && frontend.endsWith('/')) {
+    frontend = frontend.slice(0, -1);
+  }
   if (process.env.NODE_ENV === "production" && frontend) {
     return [frontend];
   }
