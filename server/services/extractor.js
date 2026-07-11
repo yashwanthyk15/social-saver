@@ -7,6 +7,26 @@ const axios = require("axios");
  */
 const extractMetadata = async (url) => {
   try {
+    // ── YouTube Special Case using oEmbed ──
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      try {
+        const ytResponse = await axios.get(
+          `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`,
+          { timeout: 8000 }
+        );
+        if (ytResponse.data) {
+          return {
+            title: ytResponse.data.title || null,
+            description: `YouTube Video by ${ytResponse.data.author_name || 'Unknown'}`,
+            image: ytResponse.data.thumbnail_url || null,
+          };
+        }
+      } catch (ytError) {
+        console.warn("YouTube oEmbed failed, falling back to microlink...");
+      }
+    }
+
+    // ── Generic Fallback via Microlink ──
     const response = await axios.get(
       `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=false&video=false`,
       { timeout: 12000 }
