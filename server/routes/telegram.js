@@ -141,10 +141,11 @@ router.post("/", async (req, res) => {
   try {
     const message = req.body.message || req.body.edited_message;
 
-    // Ignore non-text messages (photos, stickers, etc.)
-    if (!message || !message.text) return;
+    // Support text messages OR media with captions (e.g. sharing from other apps)
+    const textContent = message?.text || message?.caption;
+    if (!textContent) return;
 
-    const incomingMsg = message.text.trim();
+    const incomingMsg = textContent.trim();
     const chatId = message.chat.id;
 
     // ── Commands ──
