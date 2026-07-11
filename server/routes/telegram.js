@@ -230,7 +230,13 @@ Open your dashboard to view &amp; manage your collection.`
     );
   } catch (error) {
     console.error("❌ Telegram webhook error:", error.message);
-    // We can't reply here because res was already sent
+    const chatId = req.body?.message?.chat?.id || req.body?.edited_message?.chat?.id;
+    if (chatId) {
+      try {
+        const { sendMessage } = require("../services/telegramService");
+        await sendMessage(chatId, "❌ An internal error occurred while processing this link. Our AI might be temporarily overloaded. Please try again later.");
+      } catch (e) {}
+    }
   }
 });
 

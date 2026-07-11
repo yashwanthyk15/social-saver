@@ -24,6 +24,7 @@ const start = async () => {
 
   try {
     await connectDB();
+    await require('./models/Content').syncIndexes();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
