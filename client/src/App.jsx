@@ -160,12 +160,8 @@ export default function App() {
   // ────────────────────────────────────────────
   return (
     <>
-      <div className="bg-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
-      </div>
-      
+      <div className="premium-bg"><div className="mesh-aura"></div></div>
+      <div className="app-layout">
       <Navbar
         total={total}
         onShowStats={() => setShowStats(true)}
@@ -305,6 +301,7 @@ export default function App() {
       <AnimatePresence>
         {showStats && <StatsPanel onClose={() => setShowStats(false)} />}
       </AnimatePresence>
+      </div>
     </>
   );
 }

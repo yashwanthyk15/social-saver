@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Content = require("../models/Content");
 const authMiddleware = require("../middleware/auth");
+const { answerQuestion } = require("../services/aiService");
 
 // Apply auth to all dashboard routes
 router.use(authMiddleware);
@@ -295,6 +296,37 @@ router.delete("/delete-all", async (req, res) => {
     res.json({ message: `Deleted ${result.deletedCount} items` });
   } catch (error) {
     res.status(500).json({ error: "Delete all failed" });
+  }
+});
+
+/* ================================
+   Sidebar Chatbot RAG
+================================ */
+router.post("/chat", async (req, res) => {
+  try {
+    const phone = req.userPhone;
+    const { message } = req.body;
+
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    // Fetch up to 500 recent items to serve as RAG context
+    const data = await Content.find({ userPhone: phone })
+      .sort({ createdAt: -1 })
+      .limit(500)
+      .select("url category caption aiSummary tags userNote -_id")
+      .lean();
+
+    const contextData = JSON.stringify(data);
+
+    // Call Gemini Flash RAG function
+    const reply = await answerQuestion(message, contextData);
+
+    res.json({ reply });
+  } catch (error) {
+    console.error("Chatbot error:", error.message);
+    res.status(500).json({ error: "Failed to get AI response" });
   }
 });
 

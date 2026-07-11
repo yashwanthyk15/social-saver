@@ -30,3 +30,6 @@ api.interceptors.response.use(
     return Promise.reject(err);
   }
 );
+
+export const askChatbot = (message) => api.post('/dashboard/chat', { message });
+

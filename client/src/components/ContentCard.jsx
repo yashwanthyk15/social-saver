@@ -30,36 +30,11 @@ export default function ContentCard({ item, onDelete, onToggleFavorite, onUpdate
     finally { setFavLoading(false); }
   };
 
-  // 3D transform states
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-
-  const handleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    
-    // Max rotation 8 degrees
-    setRotateX(((y - centerY) / centerY) * -8);
-    setRotateY(((x - centerX) / centerX) * 8);
-  };
-
-  const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
-  };
-
   return (
     <>
       <motion.div
         className={`card ${deleting ? 'card-deleting' : ''}`}
         layout
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        animate={{ rotateX, rotateY, z: rotateX || rotateY ? 30 : 0 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
         {/* ── Image ── */}
         {item.image && !imgError && (

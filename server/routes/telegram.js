@@ -4,7 +4,7 @@ const router = express.Router();
 const Content = require("../models/Content");
 const { detectPlatform, isValidUrl, extractUrl } = require("../utils/platformDetector");
 const extractMetadata = require("../services/extractor");
-const analyzeContent = require("../services/aiService");
+const { analyzeContent } = require("../services/aiService");
 const { sendMessage, sendTyping } = require("../services/telegramService");
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";

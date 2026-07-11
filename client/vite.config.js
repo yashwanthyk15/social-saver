@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
-      port: 5000,
+      port: 5173,
       // Only proxy if no external API URL is set (pure local dev without ngrok)
       ...(env.VITE_API_URL ? {} : {
         proxy: {

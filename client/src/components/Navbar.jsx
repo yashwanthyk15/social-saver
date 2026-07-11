@@ -1,12 +1,19 @@
 import React from 'react';
-import { BarChart2, Sun, Moon, BookOpen } from 'lucide-react';
+import { BarChart2, Sun, Moon, Bookmark } from 'lucide-react';
+import SidebarChat from './SidebarChat';
 
 export default function Navbar({ total, onShowStats, theme, onToggleTheme }) {
   return (
-    <nav className="navbar">
+    <aside className="sidebar">
       <div className="nav-brand">
-        <div className="nav-logo-wrap">📚</div>
+        <div className="nav-logo-wrap">
+          <Bookmark size={18} fill="currentColor" />
+        </div>
         <span className="nav-title">Social Saver</span>
+      </div>
+
+      <div className="sidebar-chat-wrapper" style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        <SidebarChat />
       </div>
 
       <div className="nav-right">
@@ -30,6 +37,6 @@ export default function Navbar({ total, onShowStats, theme, onToggleTheme }) {
           Stats
         </button>
       </div>
-    </nav>
+    </aside>
   );
 }
