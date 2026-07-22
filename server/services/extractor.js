@@ -38,10 +38,28 @@ const extractMetadata = async (url) => {
       return { title: null, description: null, image: null };
     }
 
+    let finalImageUrl = data.image?.url || data.logo?.url || null;
+    let base64Image = null;
+
+    if (finalImageUrl) {
+      try {
+        const imgRes = await axios.get(finalImageUrl, {
+          responseType: "arraybuffer",
+          timeout: 8000,
+        });
+        const contentType = imgRes.headers["content-type"] || "image/jpeg";
+        const b64 = Buffer.from(imgRes.data, "binary").toString("base64");
+        base64Image = `data:${contentType};base64,${b64}`;
+      } catch (imgErr) {
+        console.warn("⚠️ Failed to convert image to base64, falling back to URL");
+        base64Image = finalImageUrl;
+      }
+    }
+
     return {
       title: data.title || null,
       description: data.description || null,
-      image: data.image?.url || data.logo?.url || null,
+      image: base64Image,
     };
   } catch (error) {
     console.error("⚠️ Metadata extraction failed:", error.message);
